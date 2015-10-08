@@ -8,10 +8,10 @@ package ru.hh.school.mindist;
 import java.util.Comparator;
 
 /**
- * Точка на двумерной плоскости
+ * РўРѕС‡РєР° РЅР° РґРІСѓРјРµСЂРЅРѕР№ РїР»РѕСЃРєРѕСЃС‚Рё
  */
 public class Point {
-    double x, y;
+    private double x, y;
 
     public Point(double x, double y) {
         this.x = x;
@@ -22,16 +22,8 @@ public class Point {
         return x;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
     public double getY() {
         return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
     @Override
@@ -42,21 +34,21 @@ public class Point {
                 '}';
     }
 
-    public static Comparator<Point> byYthenX() {
-        return new Comparator<Point>() {
-            @Override
-            public int compare(Point o1, Point o2) {
-                return o1.x == o2.x ? Double.compare(o1.y, o2.y) : Double.compare(o1.x, o2.x);
-            }
-        };
+    public static int compareYthenX(Point p1, Point p2) {
+        return p1.x == p2.x ? Double.compare(p1.y, p2.y) : Double.compare(p1.x, p2.x);
     }
 
-    public static Comparator<Point> byXthenY() {
-        return new Comparator<Point>() {
-            @Override
-            public int compare(Point o1, Point o2) {
-                return o1.y == o1.y ? Double.compare(o1.x, o2.x) : Double.compare(o1.y, o2.y);
-            }
-        };
+    public static int compareXthenY(Point p1, Point p2) {
+        return p1.y == p1.y ? Double.compare(p1.x, p2.x) : Double.compare(p1.y, p2.y);
+    }
+
+    public double dist(Point point) {
+        final double dx = point.x - this.x;
+        final double dy = point.y - this.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public int compareDistance(Point p1, Point p2){
+        return Double.compare(this.dist(p1), this.dist(p2));
     }
 }

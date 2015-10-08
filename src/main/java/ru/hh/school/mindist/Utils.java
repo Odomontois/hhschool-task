@@ -5,37 +5,71 @@
  */
 package ru.hh.school.mindist;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
- * Утилиты для обработки списов
+ * РЈС‚РёР»РёС‚С‹ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРїРёСЃРѕРІ
  */
 public class Utils {
     /**
-     * Слияние заранее сортированных коллекций в новую сортированную коллекцию
+     * РЎР»РёСЏРЅРёРµ Р·Р°СЂР°РЅРµРµ СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹С… РєРѕР»Р»РµРєС†РёР№ РІ РЅРѕРІСѓСЋ СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅСѓСЋ РєРѕР»Р»РµРєС†РёСЋ
      */
-    public static <E> Stream<E> merge(Stream<E> first, Stream<E> second, Comparator<E> comp) {
-        Stream.Builder<E> builder = Stream.builder();
-        Optional<E> h1 = first.findFirst();
-        Optional<E> h2 = second.findFirst();
+    public static <E> List<E> merge(List<E> list1, List<E> list2, Comparator<E> comp) {
+        LinkedList<E> result = new LinkedList<>();
+        PeekIterator<E> it1 = new PeekIterator<>(list1);
+        PeekIterator<E> it2 = new PeekIterator<>(list2);
 
-        while (h1.isPresent() && h2.isPresent()) {
-            if (comp.compare(h1.get(), h2.get()) >= 0) {
-                builder.accept(h1.get());
-                first = first.skip(1);
-                h1 = first.findFirst();
+        while (!it1.isEnded() && !it2.isEnded()) {
+            if (comp.compare(it1.peek(), it2.peek()) <= 0) {
+                result.addLast(it1.pull());
             } else {
-                builder.accept(h2.get());
-                second = second.skip(1);
-                h2 = second.findFirst();
+                result.addLast(it2.pull());
             }
         }
-        first.forEach(builder::add);
-        second.forEach(builder::add);
-        return builder.build();
+        it1.forEach(result::addLast);
+        it2.forEach(result::addLast);
+        return result;
+    }
+
+    public static class PeekIterator<E> {
+        private E current;
+        private boolean ended = false;
+        private Iterator<E> backing;
+
+        public void next() {
+            if (ended) throw new IllegalStateException();
+
+            if (backing.hasNext()) current = backing.next();
+            else ended = true;
+        }
+
+        public E pull() {
+            E value = peek();
+            next();
+            return value;
+        }
+
+        public E peek() {
+            if (ended) throw new IllegalStateException();
+
+            return current;
+        }
+
+        public boolean isEnded() {
+            return ended;
+        }
+
+        public PeekIterator(Iterable<E> collection) {
+            backing = collection.iterator();
+            next();
+        }
+
+        public void forEach(Consumer<E> consumer) {
+            if (ended) return;
+            consumer.accept(current);
+            backing.forEachRemaining(consumer);
+        }
     }
 }
