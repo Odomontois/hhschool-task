@@ -22,25 +22,45 @@ public abstract class MinDistSearcher<P extends Point> {
     public static class Result<P extends Point> {
         double distance;
 
-        P point1, point2;
+        Optional<P> point1, point2;
 
-        Result(double distance, P point1, P point2) {
+        private Result(double distance, Optional<P> point1, Optional<P> point2) {
             this.distance = distance;
             this.point1 = point1;
             this.point2 = point2;
         }
 
+        public static <P extends Point> Result<P> of(P point1, P point2) {
+            return new Result<>(
+                    point1.dist(point2),
+                    Optional.of(point1),
+                    Optional.of(point2));
+        }
+
+        public static <P extends Point> Result<P> single(P point) {
+            return new Result<>(
+                    Double.POSITIVE_INFINITY,
+                    Optional.of(point),
+                    Optional.empty());
+        }
+
+        public static <P extends Point> Result<P> empty() {
+            return new Result<>(
+                    Double.POSITIVE_INFINITY,
+                    Optional.empty(),
+                    Optional.empty());
+        }
 
         public Result<P> bestOf(Result<P> other) {
-            if (Double.compare(this.distance, other.distance) < 0) return this;
-            else return other;
+            if (Double.compare(this.distance, other.distance) > 0) return other;
+            else return this;
         }
 
         @Override
         public String toString() {
-            return "distance "  + distance +
-                    " between " + point1 +
-                    " and "     + point2;
+            return "distance " + distance +
+                    " between " + point1.map(P::toString).orElse("Nothing") +
+                    " and " + point2.map(P::toString).orElse("Nothing");
         }
     }
 
@@ -67,7 +87,7 @@ public abstract class MinDistSearcher<P extends Point> {
      */
     static class PointStrip<P extends Point> extends MinDistSearcher<P> {
         /**
-         * Коллекция точек в наборе - всегда отсортирована по _x_
+         * Коллекция точек в наборе - всегда отсортирована по x
          */
         private List<P> points;
 
@@ -81,7 +101,7 @@ public abstract class MinDistSearcher<P extends Point> {
             final SearchResult<P> right = rightSearch.search();
 
             final Result<P> currentResult = left.result.bestOf(right.result);
-            final List <P> pointsByY = Utils.merge(left.pointsByY, right.pointsByY, Point::compareYthenX);
+            final List<P> pointsByY = Utils.merge(left.pointsByY, right.pointsByY, Point::compareYthenX);
 
             //noinspection SuspiciousNameCombination
             final Result<P> optimal = searchAlongDivLine(left.pointsByY, right.pointsByY, currentResult);
@@ -92,8 +112,8 @@ public abstract class MinDistSearcher<P extends Point> {
         private Result<P> searchAlongDivLine(List<P> left, List<P> right, final Result<P> current) {
             final double borderX = Collections.max(left, Point::compareXthenY).getX();
 
-            final LinkedList<P> leftBorder = left.stream().filter(p -> p.getX() >= borderX - current.distance)
-                    .collect(Collectors.toCollection(LinkedList::new));
+            final List<P> leftBorder = left.stream().filter(p -> p.getX() >= borderX - current.distance)
+                    .collect(Collectors.toCollection(ArrayList::new));
             final LinkedList<P> rightBorder = right.stream().filter(p -> p.getX() <= borderX + current.distance)
                     .collect(Collectors.toCollection(LinkedList::new));
 
@@ -102,7 +122,7 @@ public abstract class MinDistSearcher<P extends Point> {
             Result<P> optimal = current;
 
             for (P p : leftBorder) {
-                //заполняем коллекцию только теми элементами, что лежат в диапазане [p.y - mindDist, p.y + minDist]
+                //заполняем коллекцию только теми элементами, что лежат в диапазоне [p.y - mindDist, p.y + minDist]
                 while (!comparing.isEmpty() && comparing.getFirst().getY() < p.getY() - optimal.distance) {
                     comparing.removeFirst();
                 }
@@ -121,8 +141,8 @@ public abstract class MinDistSearcher<P extends Point> {
         final Result<P> checkMinimumDist(P point, Collection<P> comparing, final Result<P> current) {
             return comparing.stream()
                     .min(point::compareDistance)
-                    .filter(that -> point.dist(that) < current.distance)
-                    .map(that -> new Result<>(point.dist(that), point, that))
+                    .map(that -> Result.of(point, that))
+                    .map(current::bestOf)
                     .orElse(current);
         }
 
@@ -138,7 +158,7 @@ public abstract class MinDistSearcher<P extends Point> {
         @Override
         SearchResult<P> search() {
             return new SearchResult<>(
-                    new Result<>(Double.POSITIVE_INFINITY, point, point),
+                    Result.single(point),
                     Collections.singletonList(point));
         }
 
@@ -153,6 +173,8 @@ public abstract class MinDistSearcher<P extends Point> {
     }
 
     public static <P extends Point> Result<P> find(Collection<P> points) {
+        if (points.isEmpty()) return Result.empty();
+
         final List<P> sorted = new ArrayList<>(points);
         sorted.sort(Point::compareXthenY);
         return MinDistSearcher.create(sorted).search().result;

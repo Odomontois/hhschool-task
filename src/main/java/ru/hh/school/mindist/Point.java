@@ -11,7 +11,7 @@ import java.util.Comparator;
  * Точка на двумерной плоскости
  */
 public class Point {
-    private double x, y;
+    protected double x, y;
 
     public Point(double x, double y) {
         this.x = x;
@@ -34,12 +34,12 @@ public class Point {
                 '}';
     }
 
-    public static int compareYthenX(Point p1, Point p2) {
+    public static int compareXthenY(Point p1, Point p2) {
         return p1.x == p2.x ? Double.compare(p1.y, p2.y) : Double.compare(p1.x, p2.x);
     }
 
-    public static int compareXthenY(Point p1, Point p2) {
-        return p1.y == p1.y ? Double.compare(p1.x, p2.x) : Double.compare(p1.y, p2.y);
+    public static int compareYthenX(Point p1, Point p2) {
+        return p1.y == p2.y ? Double.compare(p1.x, p2.x) : Double.compare(p1.y, p2.y);
     }
 
     public double dist(Point point) {
