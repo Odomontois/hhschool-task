@@ -4,7 +4,8 @@
  * Time  : 13:29
  */
 package ru.hh.school.midist
+import org.specs2.Specification
 
-class MinDistSearcherSpecification{
+class MinDistSearcherSpecification extends Specification{
 
 }
