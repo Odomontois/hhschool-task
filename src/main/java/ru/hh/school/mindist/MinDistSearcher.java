@@ -5,9 +5,10 @@
  */
 package ru.hh.school.mindist;
 
+import ru.hh.school.utils.SortedList;
+
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Поиск минимального расстояния методом "разделяй и властвуй"
@@ -71,10 +72,12 @@ public abstract class MinDistSearcher<P extends Point> {
         /**
          * список точек, упорядоченных по координате Y
          */
-        Result<P> result;
-        List<P> pointsByY;
+        SortedList<P> pointsByY;
 
-        public SearchResult(Result<P> result, List<P> pointsByY) {
+        Result<P> result;
+
+
+        public SearchResult(Result<P> result, SortedList<P> pointsByY) {
             this.result = result;
             this.pointsByY = pointsByY;
         }
@@ -87,7 +90,7 @@ public abstract class MinDistSearcher<P extends Point> {
      */
     static class PointStrip<P extends Point> extends MinDistSearcher<P> {
         /**
-         * Коллекция точек в наборе - всегда отсортирована по x
+         * Коллекция точек в наборе - всегда отсортирована по Y
          */
         private List<P> points;
 
@@ -101,7 +104,7 @@ public abstract class MinDistSearcher<P extends Point> {
             final SearchResult<P> right = rightSearch.search();
 
             final Result<P> currentResult = left.result.bestOf(right.result);
-            final List<P> pointsByY = Utils.merge(left.pointsByY, right.pointsByY, Point::compareYthenX);
+            final SortedList<P> pointsByY = left.pointsByY.merge(right.pointsByY, Point::compareYthenX);
 
             //noinspection SuspiciousNameCombination
             final Result<P> optimal = searchAlongDivLine(left.pointsByY, right.pointsByY, currentResult);
@@ -152,6 +155,9 @@ public abstract class MinDistSearcher<P extends Point> {
         }
     }
 
+    /**
+     * Шаг обработки одной точки
+     */
     static class SinglePoint<P extends Point> extends MinDistSearcher<P> {
         private P point;
 
@@ -159,7 +165,7 @@ public abstract class MinDistSearcher<P extends Point> {
         SearchResult<P> search() {
             return new SearchResult<>(
                     Result.single(point),
-                    Collections.singletonList(point));
+                    SortedList.singleton(point));
         }
 
         SinglePoint(P point) {
