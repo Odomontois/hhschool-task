@@ -32,7 +32,7 @@ public class CyclicSequence<A> {
 
                 int prefix = 0;
                 for (A elem : seen) {
-                    if (elem == current) break;
+                    if (elem == seen) break;
                     prefix += 1;
                 }
                 return Pair.of(prefix, seen.size() - prefix);

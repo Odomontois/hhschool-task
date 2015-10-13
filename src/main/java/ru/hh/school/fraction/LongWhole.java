@@ -60,4 +60,9 @@ public class LongWhole implements Whole<Long> {
     public int compare(Long x, Long y) {
         return x.compareTo(y);
     }
+
+    @Override
+    public Long negate(Long x) {
+        return -x;
+    }
 }

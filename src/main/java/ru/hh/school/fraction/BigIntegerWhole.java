@@ -80,4 +80,19 @@ public class BigIntegerWhole implements Whole<BigInteger> {
     public int compare(BigInteger x, BigInteger y) {
         return x.compareTo(y);
     }
+
+    @Override
+    public BigInteger gcd(BigInteger x, BigInteger y) {
+        return x.gcd(y);
+    }
+
+    @Override
+    public BigInteger negate(BigInteger x) {
+        return x.negate();
+    }
+
+    @Override
+    public BigInteger pow(BigInteger x, int p) {
+        return x.pow(p);
+    }
 }

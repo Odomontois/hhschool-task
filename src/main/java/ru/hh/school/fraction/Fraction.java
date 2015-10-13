@@ -20,13 +20,33 @@ import java.util.Optional;
  * @param <N> целый тип
  */
 public class Fraction<N> {
+    final private boolean negative;
     final private N numerator, denominator;
-    final Whole<N> whole;
+    final private Whole<N> whole;
 
-    public Fraction(N numerator, N denominator, Whole<N> whole) {
+    private Fraction(N numerator, N denominator, boolean negative, Whole<N> whole) {
         this.numerator = numerator;
         this.denominator = denominator;
+        this.negative = negative;
         this.whole = whole;
+    }
+
+    public static <N> Fraction<N> create(final N numerator, final N denominator, final Whole<N> whole) {
+        return create(
+                whole.abs(numerator),
+                whole.abs(denominator),
+                whole.sign(numerator) * whole.sign(denominator) == -1,
+                whole);
+    }
+
+    private static <N> Fraction<N> create(final N numerator, final N denominator, final boolean negative, final Whole<N> whole) {
+        if (denominator == whole.zero()) throw new ArithmeticException("division by zero");
+        final N gcd = whole.gcd(numerator, denominator);
+        return new Fraction<>(
+                whole.quot(numerator, gcd),
+                whole.quot(denominator, gcd),
+                negative,
+                whole);
     }
 
     /**
@@ -91,25 +111,75 @@ public class Fraction<N> {
 
     @Override
     public String toString() {
-        return numerator + "/" + denominator;
+        return (negative ? "-" : "") + numerator + "/" + denominator;
     }
 
-    public String toDigitalString(N base) {
-        final CyclicSequence<N> fracSeq = fractionalCycle(base, CyclicSequence.Method.MEMOIZE);
+    public String toDigitalString(final N base, CyclicSequence.Method method) {
+        final CyclicSequence<N> fracSeq = fractionalCycle(base, method);
         final List<N> intPartDigs = whole.digits(floor(), base);
         final List<N> cycleDigs = fracSeq.getCycle();
 
         final String intPart = intPartDigs.isEmpty() ? "0" : whole.toString(intPartDigs, base);
         final String prefix = whole.toString(fracSeq.getPrefix(), base);
         final String cycle;
+
         if (cycleDigs.size() == 1 && cycleDigs.get(0) == whole.zero())
             cycle = "";
         else cycle = '(' + whole.toString(cycleDigs, base) + ')';
 
-        return intPart + ',' + prefix + cycle;
+        final String fractional = prefix + cycle;
+
+        final String fracPart = fractional.isEmpty() ? "" : "," + fractional;
+        final String signPart = negative ? "-" : "";
+
+        return signPart + intPart + fracPart;
+    }
+
+    public String toDigitalString(final N base) {
+        return toDigitalString(base, CyclicSequence.Method.CONSTANT_MEMORY);
     }
 
     public String toDecimalString() {
         return toDigitalString(whole.fromInt(10));
+    }
+
+
+    public Fraction<N> add(final Fraction<N> other) {
+        final N add1 = whole.multiply(this.numerator, other.denominator);
+        final N add2 = whole.multiply(this.denominator, other.numerator);
+        final boolean signDiffers = !(negative ^ other.negative);
+
+        final N num = signDiffers ? whole.add(add1, add2) : whole.subtract(add1, add2);
+        final N signedNum = negative ? whole.negate(num) : num;
+
+        final N den = whole.multiply(this.denominator, other.denominator);
+
+        return Fraction.create(signedNum, den, whole);
+    }
+
+    public Fraction<N> negate() {
+        return new Fraction<>(numerator, denominator, !negative, whole);
+    }
+
+    public Fraction<N> subtract(Fraction<N> other) {
+        return this.add(other.negate());
+    }
+
+    public Fraction<N> multiply(Fraction<N> other) {
+        return Fraction.create(
+                whole.multiply(this.numerator, other.numerator),
+                whole.multiply(this.denominator, other.denominator),
+                !(this.negative ^ other.negative),
+                whole
+        );
+    }
+
+    public Fraction<N> divide(Fraction<N> other) {
+        return Fraction.create(
+                whole.multiply(this.numerator, other.denominator),
+                whole.multiply(this.denominator, other.numerator),
+                !(this.negative ^ other.negative),
+                whole
+        );
     }
 }

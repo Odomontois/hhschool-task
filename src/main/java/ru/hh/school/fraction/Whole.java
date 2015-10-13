@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @param <N>
  */
-interface Whole<N> {
+public interface Whole<N> {
     N add(N x, N y);
 
     N subtract(N x, N y);
@@ -35,6 +35,31 @@ interface Whole<N> {
 
     int compare(N x, N y);
 
+    default N zero() {
+        return fromInt(0);
+    }
+
+    default N one() {
+        return fromInt(1);
+    }
+
+    /**
+     * Имплементация по умолчанию методом Эйлера
+     *
+     * @return Наибольший общий делитель x и y
+     */
+    default N gcd(N x, N y) {
+        if (compare(x, y) > 0) return gcd(y, x);
+        if (compare(x, zero()) == 0) return y;
+        return gcd(mod(y, x), x);
+    }
+
+    default N pow(N x, int p) {
+        if (p == 0) return one();
+        final N higher = pow(multiply(x, x), p / 2);
+        return p % 2 == 0 ? higher : multiply(x, higher);
+    }
+
     default N abs(N x) {
         return multiply(x, fromInt(sign(x)));
     }
@@ -46,19 +71,16 @@ interface Whole<N> {
         else return -1;
     }
 
+    default N negate(N x) {
+        return multiply(x, fromInt(-1));
+    }
+
     default Pair<N, N> divMod(N x, N y) {
         final N div = quot(x, y);
         final N rem = mod(x, y);
         return Pair.of(div, rem);
     }
 
-    default N zero() {
-        return fromInt(0);
-    }
-
-    default N one() {
-        return fromInt(1);
-    }
 
     default List<N> digits(N num, N base) {
         final LinkedList<N> result = new LinkedList<>();

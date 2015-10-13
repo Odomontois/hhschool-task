@@ -10,7 +10,9 @@ import ru.hh.school.utils.Pair
 
 object Instances {
   import Integral.Implicits._
-  def whole[N: Integral] = new Whole[N] {
+  implicit def tuple2toPair[A, B] = (Pair.of[A, B] _).tupled
+
+  implicit def integral2Whole[N: Integral] = new Whole[N] {
     def int = implicitly[Integral[N]]
     override def add(x: N, y: N): N = x + y
     override def multiply(x: N, y: N): N = x * y
@@ -24,5 +26,6 @@ object Instances {
     override def zero(): N = int.zero
     override def one(): N = int.one
     override def compare(x: N, y: N): Int = int.compare(x, y)
+    override def divMod(x: N, y: N): Pair[N, N] = x /% y
   }
 }

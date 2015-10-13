@@ -1,6 +1,3 @@
-import ru.hh.school.mindist.{LabelledPoint, MinDistSearcher, Point}
-import scala.collection.JavaConversions._
-import scala.util.Random
 /**
  * Author: Oleg Nizhnik
  * Date  : 08.10.2015
@@ -11,11 +8,23 @@ object Main {
   import ru.hh.school.fraction._
   import Instances._
 
-  def main(args: Array[String]): Unit = {
-    val f = new Fraction[Int](170, 12, whole)
+  implicit val longWhole = LongWhole.INSTANCE
+  implicit val bigIntegerWhole = BigIntegerWhole.INSTANCE
 
-    println(f)
-    println(f.toDecimalString)
-    println(f.toDigitalString(2))
+  def whole[N](implicit w: Whole[N]) = w
+  def fraction[N](a: N, b: N)(implicit w: Whole[N]) = Fraction.create(a, b, w)
+
+  def main(args: Array[String]): Unit = {
+    //    val f = fraction[java.lang.Long](0L, 1L)
+    type JL = java.lang.Long
+
+    val u = 1L to 20L map (x ⇒ fraction[BigInt](whole[BigInt].one,x)) reduce (_ add _)
+    //
+    println(u)
+    println(u.toDecimalString)
+    //    println(f.toDigitalString(2L))
+    //    println(f.toDigitalString(16L))
+    //    println(f.toDigitalString(32L))
+    //    println(f.toDigitalString(100L))
   }
 }
