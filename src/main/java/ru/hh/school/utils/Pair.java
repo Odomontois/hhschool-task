@@ -4,7 +4,6 @@
  * Time  : 17:20
  */
 package ru.hh.school.utils;
-
 /**
  * Простая пара значений
  *
@@ -21,7 +20,7 @@ public class Pair<A, B> {
     }
 
     public static <A, B> Pair<A, B> of(A first, B second) {
-        return new Pair<A, B>(first, second);
+        return new Pair<>(first, second);
     }
 
     public A getFirst() {
@@ -32,7 +31,7 @@ public class Pair<A, B> {
         return second;
     }
 
-    Pair<B, A> swap() {
+    public Pair<B, A> swap() {
         return of(second, first);
     }
 }

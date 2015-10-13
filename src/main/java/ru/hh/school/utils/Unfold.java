@@ -7,46 +7,46 @@ package ru.hh.school.utils;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Аналог Data.List.unfold
- * Представляет из себя последовательность вызова некоторой функции
+ * Аналог Data.List.unfoldr в Haskell
+ * Представляет из себя последовательность элементов, генерируемую вызовом бинарной функции
  */
-public class Unfold<A, B> implements Function<B, Iterable<A>> {
-    final private Function<B, Optional<Pair<A, B>>> unfold;
+public class Unfold<A, B> implements Iterable<A> {
+    final private Function<B, Pair<A, B>> unfold;
+    final private B start;
+    final private Function<B, Boolean> doWhile;
 
-    protected Unfold(Function<B, Optional<Pair<A, B>>> unfold) {
+    protected Unfold(Function<B, Pair<A, B>> unfold, B start, Function<B, Boolean> doWhile) {
         this.unfold = unfold;
+        this.start = start;
+        this.doWhile = doWhile;
     }
 
-    public static <A, B> Unfold<A, B> of(Function<B, Optional<Pair<A, B>>> unfold) {
-        return new Unfold<A, B>(unfold);
+    /**
+     * Генерация последовательности на основе промежуточного состояния
+     */
+    public static <A, B> Unfold<A, B> of(Function<B, Boolean> hasNext, Function<B, Pair<A, B>> unfold, B start) {
+        return new Unfold<>(unfold, start, hasNext);
     }
+
+    /**
+     * Упрощённый вариант - для функций, генерирующих последовательность элеметов на основе эндоморфизмов
+     */
+    public static <A> Unfold<A, A> endo(Function<A, Boolean> hasNext, Function<A, A> unfold, A start) {
+        return new Unfold<>(unfold.andThen(x -> Pair.of(x, x)), start, hasNext);
+    }
+
 
     @Override
-    public Iterable<A> apply(B start) {
-        return new Unfolder(start);
+    public Iterator<A> iterator() {
+        return new UnfoldIterator(start);
     }
 
-
-    private class Unfolder implements Iterable<A> {
-        final private B start;
-
-        public Unfolder(B start) {
-            this.start = start;
-        }
-
-        @Override
-        public Iterator<A> iterator() {
-            return new UnfoldIterator(start);
-        }
-    }
 
     private class UnfoldIterator implements Iterator<A> {
         private B state;
-        private Optional<Pair<A, B>> produced = null;
 
         public UnfoldIterator(B state) {
             this.state = state;
@@ -54,16 +54,16 @@ public class Unfold<A, B> implements Function<B, Iterable<A>> {
 
         @Override
         public boolean hasNext() {
-            if (produced == null) produced = unfold.apply(state);
-            return produced.isPresent();
+            return doWhile.apply(state);
         }
 
         @Override
         public A next() {
             if (!hasNext()) throw new NoSuchElementException();
-            final Pair<A, B> result = produced.get();
+            final Pair<A, B> result = unfold.apply(state);
             this.state = result.getSecond();
             return result.getFirst();
         }
     }
 }
+
