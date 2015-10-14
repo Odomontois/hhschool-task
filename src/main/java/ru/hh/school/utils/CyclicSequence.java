@@ -32,7 +32,7 @@ public class CyclicSequence<A> {
 
                 int prefix = 0;
                 for (A elem : seen) {
-                    if (elem == seen) break;
+                    if (elem.equals(current)) break;
                     prefix += 1;
                 }
                 return Pair.of(prefix, seen.size() - prefix);
@@ -51,7 +51,7 @@ public class CyclicSequence<A> {
                         fast = elements.iterator();
                 int meet = 1;
                 fast.next();
-                while (slow.next() != fast.next()) {
+                while (!(slow.next().equals(fast.next()))) {
                     meet++;
                     fast.next();
                 }
@@ -62,12 +62,12 @@ public class CyclicSequence<A> {
                         skipped = elements.iterator();
                 for (int i = 0; i < meet; i++)
                     skipped.next();
-                while (fromStart.next() != skipped.next())
+                while (!fromStart.next().equals(skipped.next()))
                     prefix++;
 
                 int cycle = 1;
                 final A current = fromStart.next();
-                while (fromStart.next() != current) {
+                while (!fromStart.next().equals(current)) {
                     cycle++;
                 }
 

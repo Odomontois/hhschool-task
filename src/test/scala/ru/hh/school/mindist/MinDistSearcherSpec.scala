@@ -14,6 +14,8 @@ import org.specs2.{ScalaCheck, Specification}
 import Arbitrary._
 import ru.hh.school.util.JavaConversions._
 
+import scala.language.postfixOps
+
 class MinDistSearcherSpec extends Specification with ScalaCheck {
 
   def is = s2"""
@@ -58,6 +60,6 @@ class MinDistSearcherSpec extends Specification with ScalaCheck {
 
   def minDist[P <: Point](points: Seq[P]): (Double, Option[P], Option[P]) = {
     val result = MinDistSearcher find points
-    (result.distance, result.point1.asScala, result.point2.asScala)
+    (result.getDistance, result.getPoint1.asScala, result.getPoint2.asScala)
   }
 }

@@ -121,7 +121,7 @@ public class Fraction<N> {
         final String prefix = whole.toString(fracSeq.getPrefix(), base);
         final String cycle;
 
-        if (cycleDigs.size() == 1 && cycleDigs.get(0) == whole.zero())
+        if ( cycleDigs.size() == 1 && cycleDigs.get(0) == whole.zero())
             cycle = "";
         else cycle = '(' + whole.toString(cycleDigs, base) + ')';
 
