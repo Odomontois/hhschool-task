@@ -17,4 +17,23 @@ public class LabelledPoint<L> extends Point {
     public String toString() {
         return String.format("[%s](%s,%s)", label, x, y);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LabelledPoint)) return false;
+        if (!super.equals(o)) return false;
+
+        LabelledPoint<?> that = (LabelledPoint<?>) o;
+
+        return !(label != null ? !label.equals(that.label) : that.label != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (label != null ? label.hashCode() : 0);
+        return result;
+    }
 }

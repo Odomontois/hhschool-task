@@ -4,7 +4,6 @@
  * Time  : 12:16
  */
 package ru.hh.school.fraction
-import java.util
 
 import ru.hh.school.typeclasses.Whole
 import ru.hh.school.utils.Pair

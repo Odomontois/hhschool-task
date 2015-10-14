@@ -7,9 +7,12 @@ package ru.hh.school.utils;
 
 import java.util.Iterator;
 
+/**
+ * Конкатенация двух Iterable
+ */
 public class Concatenation<A> implements Iterable<A> {
-    final Iterable<A> first;
-    final Iterable<A> second;
+    final Iterable<? extends A> first;
+    final Iterable<? extends A> second;
 
     private Concatenation(Iterable<A> first, Iterable<A> second) {
         this.first = first;
@@ -27,7 +30,7 @@ public class Concatenation<A> implements Iterable<A> {
 
     private class CIterator implements Iterator<A> {
         boolean switched = false;
-        Iterator<A> it = first.iterator();
+        Iterator<? extends A> it = first.iterator();
 
         private void checkSwitch() {
             if (it.hasNext() || switched) return;

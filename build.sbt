@@ -8,3 +8,10 @@ val testLibs = Seq(
 libraryDependencies ++= testLibs
 
 scalacOptions in Test ++= Seq("-Yrangepos")
+
+javacOptions in(Compile, doc) ++= Seq(
+  "-notimestamp",
+  "-linksource",
+  "-encoding", "utf-8",
+  "-docencoding", "utf-8",
+  "-charset", "utf8")

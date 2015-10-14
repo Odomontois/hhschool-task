@@ -28,10 +28,7 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
+        return '(' + x + " , " + y + ')';
     }
 
     public static int compareXthenY(Point p1, Point p2) {
@@ -48,7 +45,7 @@ public class Point {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    public int compareDistance(Point p1, Point p2){
+    public int compareDistance(Point p1, Point p2) {
         return Double.compare(this.dist(p1), this.dist(p2));
     }
 
