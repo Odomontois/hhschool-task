@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ru">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Author: Oleg Nizhnik<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * Date  : 14.10.2015<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * Time  : 9:23<a name="line.4"></a>
+<span class="sourceLineNo">005</span> */<a name="line.5"></a>
+<span class="sourceLineNo">006</span>package ru.hh.school.runnable;<a name="line.6"></a>
+<span class="sourceLineNo">007</span><a name="line.7"></a>
+<span class="sourceLineNo">008</span>import ru.hh.school.typeclasses.BigIntegerWhole;<a name="line.8"></a>
+<span class="sourceLineNo">009</span>import ru.hh.school.fraction.Fraction;<a name="line.9"></a>
+<span class="sourceLineNo">010</span>import ru.hh.school.typeclasses.LongWhole;<a name="line.10"></a>
+<span class="sourceLineNo">011</span>import ru.hh.school.typeclasses.Whole;<a name="line.11"></a>
+<span class="sourceLineNo">012</span>import ru.hh.school.utils.CyclicSequence;<a name="line.12"></a>
+<span class="sourceLineNo">013</span>import ru.hh.school.utils.Pair;<a name="line.13"></a>
+<span class="sourceLineNo">014</span><a name="line.14"></a>
+<span class="sourceLineNo">015</span>import java.io.IOException;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import java.nio.file.Files;<a name="line.16"></a>
+<span class="sourceLineNo">017</span>import java.nio.file.Paths;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import java.util.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>public class Fractions {<a name="line.20"></a>
+<span class="sourceLineNo">021</span>    enum Flag implements RunFlag {<a name="line.21"></a>
+<span class="sourceLineNo">022</span>        BIG_INTEGER("-b", "--bigint"),<a name="line.22"></a>
+<span class="sourceLineNo">023</span>        LONG("-l", "--long"),<a name="line.23"></a>
+<span class="sourceLineNo">024</span>        CONSTANT_MEMORY("-cm", "--O1memory"),<a name="line.24"></a>
+<span class="sourceLineNo">025</span>        MEMOIZE("-s", "--memoize");<a name="line.25"></a>
+<span class="sourceLineNo">026</span><a name="line.26"></a>
+<span class="sourceLineNo">027</span>        private String[] params;<a name="line.27"></a>
+<span class="sourceLineNo">028</span><a name="line.28"></a>
+<span class="sourceLineNo">029</span>        Flag(String... params) {<a name="line.29"></a>
+<span class="sourceLineNo">030</span>            this.params = params;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>        }<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span>        @Override<a name="line.33"></a>
+<span class="sourceLineNo">034</span>        public String[] getParams() {<a name="line.34"></a>
+<span class="sourceLineNo">035</span>            return params;<a name="line.35"></a>
+<span class="sourceLineNo">036</span>        }<a name="line.36"></a>
+<span class="sourceLineNo">037</span>    }<a name="line.37"></a>
+<span class="sourceLineNo">038</span><a name="line.38"></a>
+<span class="sourceLineNo">039</span>    static &lt;N&gt; Pair&lt;Fraction&lt;N&gt;, N&gt; parseFraction(String line, Whole&lt;N&gt; whole) {<a name="line.39"></a>
+<span class="sourceLineNo">040</span>        final StringTokenizer tok = new StringTokenizer(line);<a name="line.40"></a>
+<span class="sourceLineNo">041</span>        final N numerator = whole.parse(tok.nextToken());<a name="line.41"></a>
+<span class="sourceLineNo">042</span>        final N denominator = whole.parse(tok.nextToken());<a name="line.42"></a>
+<span class="sourceLineNo">043</span>        final N base = whole.parse(tok.nextToken());<a name="line.43"></a>
+<span class="sourceLineNo">044</span>        final Fraction&lt;N&gt; fraction = Fraction.create(numerator, denominator, whole);<a name="line.44"></a>
+<span class="sourceLineNo">045</span>        return Pair.of(fraction, base);<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    }<a name="line.46"></a>
+<span class="sourceLineNo">047</span><a name="line.47"></a>
+<span class="sourceLineNo">048</span><a name="line.48"></a>
+<span class="sourceLineNo">049</span>    static &lt;N&gt; List&lt;Pair&lt;Fraction&lt;N&gt;, N&gt;&gt; parseFractions(String filename, Whole&lt;N&gt; whole) throws IOException {<a name="line.49"></a>
+<span class="sourceLineNo">050</span>        final List&lt;String&gt; lines = Files.readAllLines(Paths.get(filename));<a name="line.50"></a>
+<span class="sourceLineNo">051</span>        final List&lt;Pair&lt;Fraction&lt;N&gt;, N&gt;&gt; fractions = new ArrayList&lt;&gt;(lines.size());<a name="line.51"></a>
+<span class="sourceLineNo">052</span><a name="line.52"></a>
+<span class="sourceLineNo">053</span>        lines.stream().map(line -&gt; parseFraction(line, whole)).forEach(fractions::add);<a name="line.53"></a>
+<span class="sourceLineNo">054</span><a name="line.54"></a>
+<span class="sourceLineNo">055</span>        return fractions;<a name="line.55"></a>
+<span class="sourceLineNo">056</span>    }<a name="line.56"></a>
+<span class="sourceLineNo">057</span><a name="line.57"></a>
+<span class="sourceLineNo">058</span>    static &lt;N&gt; List&lt;String&gt; createReprs(String filename, Whole&lt;N&gt; whole, CyclicSequence.Method method) throws IOException {<a name="line.58"></a>
+<span class="sourceLineNo">059</span>        final List&lt;Pair&lt;Fraction&lt;N&gt;, N&gt;&gt; fractions = parseFractions(filename, whole);<a name="line.59"></a>
+<span class="sourceLineNo">060</span>        final List&lt;String&gt; reprs = new ArrayList&lt;&gt;(fractions.size());<a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>        fractions.stream()<a name="line.62"></a>
+<span class="sourceLineNo">063</span>                .map(fraction -&gt; fraction.getFirst().toDigitalString(fraction.getSecond(), method))<a name="line.63"></a>
+<span class="sourceLineNo">064</span>                .forEach(reprs::add);<a name="line.64"></a>
+<span class="sourceLineNo">065</span><a name="line.65"></a>
+<span class="sourceLineNo">066</span>        return reprs;<a name="line.66"></a>
+<span class="sourceLineNo">067</span>    }<a name="line.67"></a>
+<span class="sourceLineNo">068</span><a name="line.68"></a>
+<span class="sourceLineNo">069</span>    public static void main(String[] args) {<a name="line.69"></a>
+<span class="sourceLineNo">070</span>        try {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>            final Set&lt;Flag&gt; flags = RunFlag.parse(Flag.values(), Arrays.asList(args).subList(1, args.length));<a name="line.71"></a>
+<span class="sourceLineNo">072</span>            final Whole&lt;?&gt; whole;<a name="line.72"></a>
+<span class="sourceLineNo">073</span>            final CyclicSequence.Method method;<a name="line.73"></a>
+<span class="sourceLineNo">074</span><a name="line.74"></a>
+<span class="sourceLineNo">075</span>            //BigInteger приоритетней и по умолчанию<a name="line.75"></a>
+<span class="sourceLineNo">076</span>            if (flags.contains(Flag.BIG_INTEGER))<a name="line.76"></a>
+<span class="sourceLineNo">077</span>                whole = BigIntegerWhole.INSTANCE;<a name="line.77"></a>
+<span class="sourceLineNo">078</span>            else if (flags.contains(Flag.LONG))<a name="line.78"></a>
+<span class="sourceLineNo">079</span>                whole = LongWhole.INSTANCE;<a name="line.79"></a>
+<span class="sourceLineNo">080</span>            else whole = BigIntegerWhole.INSTANCE;<a name="line.80"></a>
+<span class="sourceLineNo">081</span><a name="line.81"></a>
+<span class="sourceLineNo">082</span>            //Constant-memory приоритетней и по умолчанию<a name="line.82"></a>
+<span class="sourceLineNo">083</span>            if (flags.contains(Flag.CONSTANT_MEMORY))<a name="line.83"></a>
+<span class="sourceLineNo">084</span>                method = CyclicSequence.Method.CONSTANT_MEMORY;<a name="line.84"></a>
+<span class="sourceLineNo">085</span>            else if (flags.contains(Flag.MEMOIZE))<a name="line.85"></a>
+<span class="sourceLineNo">086</span>                method = CyclicSequence.Method.MEMOIZE;<a name="line.86"></a>
+<span class="sourceLineNo">087</span>            else method = CyclicSequence.Method.MEMOIZE;<a name="line.87"></a>
+<span class="sourceLineNo">088</span><a name="line.88"></a>
+<span class="sourceLineNo">089</span>            final List&lt;String&gt; reprs = createReprs(args[0], whole, method);<a name="line.89"></a>
+<span class="sourceLineNo">090</span><a name="line.90"></a>
+<span class="sourceLineNo">091</span>            reprs.forEach(System.out::println);<a name="line.91"></a>
+<span class="sourceLineNo">092</span>        } catch (IOException ex) {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>            System.err.println(ex.getMessage());<a name="line.93"></a>
+<span class="sourceLineNo">094</span>        } catch (Throwable ex) {<a name="line.94"></a>
+<span class="sourceLineNo">095</span>            ex.printStackTrace(System.err);<a name="line.95"></a>
+<span class="sourceLineNo">096</span>        }<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    }<a name="line.97"></a>
+<span class="sourceLineNo">098</span>}<a name="line.98"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
