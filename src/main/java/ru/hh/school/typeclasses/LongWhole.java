@@ -3,7 +3,7 @@
  * Date  : 13.10.2015
  * Time  : 10:46
  */
-package ru.hh.school.fraction;
+package ru.hh.school.typeclasses;
 
 public class LongWhole implements Whole<Long> {
     private LongWhole() {
@@ -64,5 +64,10 @@ public class LongWhole implements Whole<Long> {
     @Override
     public Long negate(Long x) {
         return -x;
+    }
+
+    @Override
+    public Long parse(String s) {
+        return Long.parseLong(s);
     }
 }

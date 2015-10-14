@@ -1,3 +1,4 @@
+import ru.hh.school.typeclasses.{LongWhole, BigIntegerWhole, Whole}
 /**
  * Author: Oleg Nizhnik
  * Date  : 08.10.2015

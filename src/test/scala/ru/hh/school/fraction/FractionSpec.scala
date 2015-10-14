@@ -8,6 +8,7 @@ import org.scalacheck.{Gen, Arbitrary}
 import org.specs2.{ScalaCheck, Specification}
 import Arbitrary._
 import Gen._
+import ru.hh.school.typeclasses.{LongWhole, BigIntegerWhole, Whole}
 
 class FractionSpec extends Specification with ScalaCheck {
   type JL = java.lang.Long
@@ -55,5 +56,5 @@ class FractionSpec extends Specification with ScalaCheck {
   implicit val arbLong = Arbitrary(chooseNum(-10000000L, 10000000L).map(x => x: java.lang.Long))
 
   case class DecPower(pow: Int)
-  implicit val arbDecPower = Arbitrary(chooseNum(1, 10).map(DecPower(_)))
+  implicit val arbDecPower = Arbitrary(chooseNum(1, 10).map(DecPower.apply))
 }

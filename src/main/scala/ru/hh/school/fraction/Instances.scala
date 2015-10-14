@@ -6,6 +6,7 @@
 package ru.hh.school.fraction
 import java.util
 
+import ru.hh.school.typeclasses.Whole
 import ru.hh.school.utils.Pair
 
 object Instances {
@@ -27,5 +28,6 @@ object Instances {
     override def one(): N = int.one
     override def compare(x: N, y: N): Int = int.compare(x, y)
     override def divMod(x: N, y: N): Pair[N, N] = x /% y
+    override def parse(s: String): N = fromInt(s.toInt)
   }
 }

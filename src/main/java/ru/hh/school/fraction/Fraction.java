@@ -5,14 +5,13 @@
  */
 package ru.hh.school.fraction;
 
+import ru.hh.school.typeclasses.Whole;
 import ru.hh.school.utils.Concatenation;
 import ru.hh.school.utils.CyclicSequence;
-import ru.hh.school.utils.Pair;
 import ru.hh.school.utils.Unfold;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Рациональные числа, представленные как пара  целых чисел: числитель и знаменатель
@@ -49,6 +48,11 @@ public class Fraction<N> {
                 whole);
     }
 
+
+    public boolean isNegative() {
+        return negative;
+    }
+
     /**
      * @return Числитель дроби
      */
@@ -63,12 +67,6 @@ public class Fraction<N> {
         return denominator;
     }
 
-    /**
-     * @return целая часть числа
-     */
-    public N floor() {
-        return whole.quot(numerator, denominator);
-    }
 
     /**
      * Дробная часть числа
@@ -143,7 +141,23 @@ public class Fraction<N> {
         return toDigitalString(whole.fromInt(10));
     }
 
+    /**
+     * @return целая часть числа
+     */
+    public N floor() {
+        return whole.quot(numerator, denominator);
+    }
 
+    /**
+     * @return модуль числа
+     */
+    public Fraction<N> abs() {
+        return Fraction.create(numerator, denominator, false, whole);
+    }
+
+    /**
+     * @return сумма двух дробей
+     */
     public Fraction<N> add(final Fraction<N> other) {
         final N add1 = whole.multiply(this.numerator, other.denominator);
         final N add2 = whole.multiply(this.denominator, other.numerator);
@@ -157,14 +171,23 @@ public class Fraction<N> {
         return Fraction.create(signedNum, den, whole);
     }
 
+    /**
+     * @return дробь с тем же модулем, но обратным знаком
+     */
     public Fraction<N> negate() {
         return new Fraction<>(numerator, denominator, !negative, whole);
     }
 
+    /**
+     * @return разность двух дробей
+     */
     public Fraction<N> subtract(Fraction<N> other) {
         return this.add(other.negate());
     }
 
+    /**
+     * @return произведение двух дробей
+     */
     public Fraction<N> multiply(Fraction<N> other) {
         return Fraction.create(
                 whole.multiply(this.numerator, other.numerator),
@@ -174,6 +197,9 @@ public class Fraction<N> {
         );
     }
 
+    /**
+     * @return частное двух дробей
+     */
     public Fraction<N> divide(Fraction<N> other) {
         return Fraction.create(
                 whole.multiply(this.numerator, other.denominator),

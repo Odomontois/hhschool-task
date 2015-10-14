@@ -3,7 +3,7 @@
  * Date  : 13.10.2015
  * Time  : 10:48
  */
-package ru.hh.school.fraction;
+package ru.hh.school.typeclasses;
 
 import ru.hh.school.utils.Pair;
 
@@ -94,5 +94,10 @@ public class BigIntegerWhole implements Whole<BigInteger> {
     @Override
     public BigInteger pow(BigInteger x, int p) {
         return x.pow(p);
+    }
+
+    @Override
+    public BigInteger parse(String s) {
+        return new BigInteger(s);
     }
 }

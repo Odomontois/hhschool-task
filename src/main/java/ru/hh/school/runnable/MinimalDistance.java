@@ -17,8 +17,9 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class MinimalDistance {
-    enum Flag {
-        LABELLED("-l", "--labelled");
+    enum Flag implements RunFlag {
+        LABELLED("-l", "--labelled"),
+        VERBOSE("-l", "--verbose");
 
         private String[] params;
 
@@ -26,29 +27,14 @@ public class MinimalDistance {
             this.params = params;
         }
 
-        public static Optional<Flag> parseOne(String arg) {
-            for (Flag flag : values())
-                for (String param : flag.params)
-                    if (arg == param) return Optional.of(flag);
-
-            return Optional.empty();
-        }
-
-        public static Set<Flag> parse(List<String> args) {
-            final Set<Flag> result = new HashSet<>();
-
-            args.stream()
-                    .map(Flag::parseOne)
-                    .flatMap(f -> f.map(Stream::of).orElse(Stream.empty()))
-                    .forEach(result::add);
-
-            return result;
+        @Override
+        public String[] getParams() {
+            return params;
         }
     }
 
-
-    static Point parsePoint(String s) {
-        final StringTokenizer tok = new StringTokenizer(s);
+    static Point parsePoint(String line) {
+        final StringTokenizer tok = new StringTokenizer(line);
         final double x = Double.parseDouble(tok.nextToken());
         final double y = Double.parseDouble(tok.nextToken());
         return new Point(x, y);
@@ -62,26 +48,33 @@ public class MinimalDistance {
         return new LabelledPoint<>(x, y, label);
     }
 
+    static List<Point> parsePoints(String filename, boolean labelled) throws IOException {
+        final List<String> lines = Files.readAllLines(Paths.get(filename));
+        final List<Point> points = new ArrayList<>(lines.size());
+        final Function<String, Point> parse;
+
+        if (labelled) parse = MinimalDistance::parseLabelled;
+        else parse = MinimalDistance::parsePoint;
+        lines.stream().map(parse).forEach(points::add);
+
+        return points;
+    }
+
+    static void report(MinDistSearcher.Result<Point> result, boolean verbose) {
+        System.out.println(verbose ? result : result.getDistance());
+    }
+
     public static void main(String[] args) {
         try {
-            final List<String> lines = Files.readAllLines(Paths.get(args[0]));
-            final List<Point> points = new ArrayList<>(lines.size());
-            final Set<Flag> flags = Flag.parse(Arrays.asList(args).subList(1, args.length));
-            final Function<String, Point> parse;
+            final Set<Flag> flags = RunFlag.parse(Flag.values(), Arrays.asList(args).subList(1, args.length));
 
-            if (flags.contains(Flag.LABELLED))
-                parse = MinimalDistance::parseLabelled;
-            else parse = MinimalDistance::parsePoint;
-
-            lines.stream().map(parse).forEach(points::add);
-            System.out.println(MinDistSearcher.find(points));
-
+            List<Point> points = parsePoints(args[0], flags.contains(Flag.LABELLED));
+            report(MinDistSearcher.find(points), flags.contains(Flag.VERBOSE));
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace(System.err);
         }
-
     }
 }

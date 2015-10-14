@@ -21,9 +21,21 @@ public abstract class MinDistSearcher<P extends Point> {
      * Промежуточное решение алгоритма "разделяй и властвуй"
      */
     public static class Result<P extends Point> {
-        double distance;
+        private double distance;
 
-        Optional<P> point1, point2;
+        private Optional<P> point1, point2;
+
+        public double getDistance() {
+            return distance;
+        }
+
+        public Optional<P> getPoint1() {
+            return point1;
+        }
+
+        public Optional<P> getPoint2() {
+            return point2;
+        }
 
         private Result(double distance, Optional<P> point1, Optional<P> point2) {
             this.distance = distance;
