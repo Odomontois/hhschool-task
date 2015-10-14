@@ -14,8 +14,6 @@ import org.specs2.{ScalaCheck, Specification}
 import Arbitrary._
 import ru.hh.school.util.JavaConversions._
 
-import scala.language.postfixOps
-
 class MinDistSearcherSpec extends Specification with ScalaCheck {
 
   def is = s2"""
@@ -39,9 +37,9 @@ class MinDistSearcherSpec extends Specification with ScalaCheck {
   def bruteforce = prop { (p1: Point, p2: Point, rest: Seq[Point]) ⇒
     val whole = p1 +: p2 +: rest
     val algDist = minDist(whole)._1
-    val bruteDist = whole combinations 2 map {
+    val bruteDist = (whole combinations 2 map {
       case Seq(pu, pv) ⇒ pu dist pv
-    } min
+    }).min
 
     algDist === bruteDist
   }

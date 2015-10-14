@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 /**
  * Итератор, хранящий текущее состояние для просмотра
+ * своровано с http://stackoverflow.com/a/27597442/210905
  */
 public class PeekableIterator<E> implements Iterator<E> {
     private final Iterator<E> backing;

@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class MinimalDistance {
     enum Flag implements RunFlag {
         LABELLED("-l", "--labelled"),
-        VERBOSE("-l", "--verbose");
+        VERBOSE("-v", "--verbose");
 
         private String[] params;
 

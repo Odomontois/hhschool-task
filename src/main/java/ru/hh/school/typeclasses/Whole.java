@@ -49,7 +49,7 @@ public interface Whole<N> extends Numeric<N>, Ordering<N> {
     default List<N> digits(N num, N base) {
         final LinkedList<N> result = new LinkedList<>();
 
-        Unfold.of(n -> n != zero(), n -> divMod(n, base).swap(), num).forEach(result::addFirst);
+        Unfold.of(n -> !n.equals(zero()), n -> divMod(n, base).swap(), num).forEach(result::addFirst);
 
         return result;
     }

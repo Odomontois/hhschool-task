@@ -113,6 +113,8 @@ public class Fraction<N> {
     }
 
     public String toDigitalString(final N base, CyclicSequence.Method method) {
+        if (whole.compare(base, whole.one()) <= 0) throw new ArithmeticException("use base >= 2");
+
         final CyclicSequence<N> fracSeq = fractionalCycle(base, method);
         final List<N> intPartDigs = whole.digits(floor(), base);
         final List<N> cycleDigs = fracSeq.getCycle();
@@ -121,7 +123,7 @@ public class Fraction<N> {
         final String prefix = whole.toString(fracSeq.getPrefix(), base);
         final String cycle;
 
-        if ( cycleDigs.size() == 1 && cycleDigs.get(0) == whole.zero())
+        if (cycleDigs.size() == 1 && cycleDigs.get(0) == whole.zero())
             cycle = "";
         else cycle = '(' + whole.toString(cycleDigs, base) + ')';
 
@@ -192,7 +194,7 @@ public class Fraction<N> {
         return Fraction.create(
                 whole.multiply(this.numerator, other.numerator),
                 whole.multiply(this.denominator, other.denominator),
-                !(this.negative ^ other.negative),
+                this.negative ^ other.negative,
                 whole
         );
     }
@@ -204,7 +206,7 @@ public class Fraction<N> {
         return Fraction.create(
                 whole.multiply(this.numerator, other.denominator),
                 whole.multiply(this.denominator, other.numerator),
-                !(this.negative ^ other.negative),
+                this.negative ^ other.negative,
                 whole
         );
     }
