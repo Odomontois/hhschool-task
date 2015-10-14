@@ -1,5 +1,7 @@
 # Задание для школы программистов HeadHunter
 
+###[JAVADOC][javadoc]
+
 ## Минимальное расстояние
 
 Реализация алгоритма "разделяй и властвуй" находит минимальное расстояние в худшем случае за время `O(n log(n))` для `n` точек
@@ -123,6 +125,7 @@
 * `-cm`, `--O1memory` - использовать алгоритм `CONSTANT_MEMORY` c *быстрым* и *медленным* обходом (по умолчанию)
 * `-s`, `--memoize` - использовать алгоритм `MEMOIZE` c сохранением в [`java.util.LinkedHashSet`][LinkedHashSet]
 
+[javadoc]:https://odomontois.github.io/hhschool-task/target/scala-2.11/api/index.html
 [1]:https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
 [2]:http://e-maxx.ru/algo/nearest_points
 [3]:https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0_%D1%81%D0%BB%D0%B8%D1%8F%D0%BD%D0%B8%D0%B5%D0%BC
